@@ -13,11 +13,10 @@ import com.github.pagehelper.PageHelper;
 import io.renren.config.MongoManager;
 import io.renren.dao.GeneratorDao;
 import io.renren.dao.MongoDBGeneratorDao;
-import io.renren.entity.mongo.MongoDefinition;
 import io.renren.factory.MongoDBCollectionFactory;
 import io.renren.utils.GenUtils;
 import io.renren.utils.PageUtils;
-import io.renren.utils.Query;
+import io.renren.utils.QueryParamMap;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,14 +37,14 @@ public class SysGeneratorService {
     private GeneratorDao generatorDao;
 
 
-    public PageUtils queryList(Query query) {
-        Page<?> page = PageHelper.startPage(query.getPage(), query.getLimit());
-        List<Map<String, Object>> list = generatorDao.queryList(query);
+    public PageUtils queryList(QueryParamMap queryParamMap) {
+        Page<?> page = PageHelper.startPage(queryParamMap.getPage(), queryParamMap.getLimit());
+        List<Map<String, Object>> list = generatorDao.queryList(queryParamMap);
         int total = (int) page.getTotal();
         if (generatorDao instanceof MongoDBGeneratorDao) {
-            total = MongoDBCollectionFactory.getCollectionTotal(query);
+            total = MongoDBCollectionFactory.getCollectionTotal(queryParamMap);
         }
-        return new PageUtils(list, total, query.getLimit(), query.getPage());
+        return new PageUtils(list, total, queryParamMap.getLimit(), queryParamMap.getPage());
     }
 
     public Map<String, String> queryTable(String tableName) {
